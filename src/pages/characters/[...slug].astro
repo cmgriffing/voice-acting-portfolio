@@ -1,0 +1,73 @@
+---
+import { getEntry, getCollection } from "astro:content";
+import Case from "case";
+import MainLayout from "@layouts/main.astro";
+import Tags from "@components/characters/tags.astro";
+import { AudioClips } from "src/types";
+import { characterAudioClipMetadata } from "src/data";
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection("characters");
+  return blogEntries.map((entry) => ({
+    params: { slug: Case.kebab(entry.data.name) },
+    props: { entry },
+  }));
+}
+
+const { slug } = Astro.params;
+
+const currentCharacter = await getEntry("characters", slug);
+
+const allAudioClips = await Astro.glob(`public/audio/characters/**/*.mp3`);
+
+const characterAudioClips = allAudioClips.filter(
+  (audioClip) => audioClip.default.indexOf(slug) > -1
+);
+
+const supportedAudioClips = AudioClips.filter((audioClipName) =>
+  characterAudioClips.find(
+    (audioClip) => audioClip.default.indexOf(Case.kebab(audioClipName)) > -1
+  )
+);
+---
+
+<MainLayout>
+  <div class="flex gap-2">
+    <div class="w-1/2">
+      <h1 class="text-2xl">Character: {currentCharacter?.data.name}</h1>
+      <Tags tags={currentCharacter?.data.tags || []} />
+      <p>{currentCharacter?.data.description}</p>
+    </div>
+    <div class="w-1/2 items-center flex flex-col">
+      <img
+        class="rounded-full object-contain shadow-md"
+        src=`https://placecage.lucidinternets.com/24${0}/24${0}`
+        transition:name={`character-image-${Case.kebab(currentCharacter!.data.name)}`}
+        transition:animate="slide"
+      />
+    </div>
+  </div>
+  <div class="mt-4">
+    <h2 class="font-bold text-2xl text-center">Sample Clips</h2>
+    <div class="flex gap-4">
+      {
+        supportedAudioClips.map((clipName) => {
+          const metadata = characterAudioClipMetadata[clipName];
+          return (
+            <div class="flex flex-col gap-2 hover:shadow-md rounded p-2">
+              <h3 class="font-bold text-lg">{metadata.name}</h3>
+              <p>{metadata.description}</p>
+              <audio
+                controls
+                src={`/audio/characters/${slug}/${clipName}.mp3`}
+              />
+              <a href={`/clips/${Case.kebab(clipName)}`} class="">
+                Other Characters
+              </a>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</MainLayout>

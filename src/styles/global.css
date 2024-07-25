@@ -1,0 +1,99 @@
+:root {
+  --accentColor: #aaa;
+  --textColor: #555;
+  --borderColor: #e5e5e5;
+  --backgroundColor: #eee;
+  --linkHoverColor: #dd5424;
+  --headingColor: #333;
+
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 800px;
+  --breakpoint-lg: 1000px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1600px;
+}
+
+body {
+  background: var(--backgroundColor);
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  font-family: Bitter, serif;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--headingColor);
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+  color: var(--headingColor);
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover,
+h5 a:hover,
+h6 a:hover {
+  color: var(--linkHoverColor);
+}
+
+a {
+  color: var(--linkHoverColor);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #000;
+}
+
+::selection {
+  background: #000;
+  color: #fff;
+  text-shadow: none;
+}
+
+.custom-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+@media (min-width: 600px) {
+  .custom-container {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 800px) {
+  .custom-container {
+    max-width: 800px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .custom-container {
+    max-width: 1000px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .custom-container {
+    max-width: 1200px;
+  }
+}

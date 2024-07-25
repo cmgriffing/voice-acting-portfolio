@@ -1,0 +1,76 @@
+---
+import { getCollection } from "astro:content";
+import Case from "case";
+import MainLayout from "@layouts/main.astro";
+import Tags from "@components/characters/tags.astro";
+import { AudioClip } from "src/types";
+import { characterAudioClipMetadata } from "src/data";
+
+export async function getStaticPaths() {
+  return Object.keys(characterAudioClipMetadata).map((clipName) => ({
+    params: { slug: Case.kebab(clipName) },
+    props: {},
+  }));
+}
+
+const { slug } = Astro.params;
+
+const currentClipName = Case.camel(slug) as AudioClip;
+
+const currentClip = characterAudioClipMetadata[currentClipName];
+console.log({ currentClipName, currentClip });
+
+const allAudioClips = await Astro.glob(`public/audio/characters/**/*.mp3`);
+
+const allCharacters = await getCollection("characters");
+
+const audioClipCharacters = allAudioClips.filter(
+  (audioClip) => audioClip.default.indexOf(slug) > -1
+);
+
+const supportedCharacters = allCharacters.filter((character) =>
+  audioClipCharacters.find(
+    (audioClip) =>
+      audioClip.default.indexOf(Case.kebab(character.data.name)) > -1
+  )
+);
+
+console.log({ audioClipCharacters, supportedCharacters });
+---
+
+<MainLayout>
+  <div class="flex flex-col mx-auto max-w-[24rem]">
+    <h1 class="text-2xl font-bold text-center">
+      Clip: <span>
+        {currentClip.name}
+      </span>
+    </h1>
+    <p>{currentClip.description}</p>
+    <p>{currentClip.reference}</p>
+  </div>
+  <div class="mt-4">
+    <h2 class="font-bold text-2xl text-center">Characters</h2>
+    <div class="flex gap-4">
+      {
+        supportedCharacters.map((character) => {
+          return (
+            <div class="flex flex-col gap-2 hover:shadow-md rounded p-2">
+              <h3 class="font-bold text-lg">{character.data.name}</h3>
+              <Tags tags={character.data.tags} />
+              <audio
+                controls
+                src={`/audio/characters/${Case.kebab(character.data.name)}/${slug}.mp3`}
+              />
+              <a
+                href={`/characters/${Case.kebab(character.data.name)}`}
+                class=""
+              >
+                Other Clips
+              </a>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</MainLayout>

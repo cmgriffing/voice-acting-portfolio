@@ -1,0 +1,36 @@
+---
+import { getCollection } from "astro:content";
+import "../styles/global.css";
+import MainLayout from "../layouts/main.astro";
+import Tags from "@components/characters/tags.astro";
+import Case from "case";
+
+const allCharacters = await getCollection("characters");
+---
+
+<MainLayout>
+  <h2 class="text-2xl font-bold text-center">Example Characters</h2>
+  <div class="flex gap-2 justify-evenly w-full">
+    {
+      allCharacters.map((character, characterIndex) => (
+        <a
+          class="group flex rounded-lg  hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-lg"
+          href={`/characters/${Case.kebab(character.data.name)}`}
+        >
+          <div class="p-2 h-[100px] w-[100px]">
+            <img
+              class="h-full w-full rounded-full"
+              src={`https://placecage.lucidinternets.com/24${characterIndex}/24${characterIndex}`}
+              transition:name={`character-image-${Case.kebab(character.data.name)}`}
+              transition:animate="slide"
+            />
+          </div>
+          <div class="flex flex-col p-2">
+            <h3 class="text-lg font-bold">{character.data.name}</h3>
+            <Tags tags={character.data.tags} />
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</MainLayout>
